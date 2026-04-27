@@ -1,6 +1,6 @@
 #include <DmxSimple.h>
 
-uint8_t buffer[1024]; //raw data
+uint8_t buffer[512]; //raw data
 
 bool synced = false;
 uint16_t index = 0;
@@ -34,14 +34,17 @@ void loop() {
 
         //dumper
         if (index < 1024) {
-            buffer[index++] = b;
+            if (index%2 == 0) {
+                buffer[index/2] = b;
+            }
+            index++;
             continue;
         }
 
         //checksum
         uint8_t receivedChecksum = b;
 
-        if (checkChecksum(buffer, 1024, receivedChecksum)) {
+        if (checkChecksum(buffer, 512, receivedChecksum)) {
             onPacketReceived();
         } 
 
@@ -49,7 +52,6 @@ void loop() {
         index = 0;
     }
 }
-
 bool checkChecksum(uint8_t *buf, uint16_t len, uint8_t checksum) {
     uint8_t sum = 0;
     for (uint16_t i = 0; i < len; i++) {
@@ -63,10 +65,10 @@ bool checkChecksum(uint8_t *buf, uint16_t len, uint8_t checksum) {
 
 
 void onPacketReceived() {
-    digitalWrite(13,LOW);
-    analogWrite(13,buffer[0]);
-	for (int i = 0; i<512; i++)
+    //digitalWrite(13,LOW);
+    //analogWrite(13,buffer[0]);
+    for (int i = 0; i<512; i++)
     {
-	    DmxSimple.write(i+1,buffer[i*2]);
+        DmxSimple.write(i+1,buffer[i]);
     }
 }

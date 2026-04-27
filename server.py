@@ -4,6 +4,7 @@ import traceback
 import struct
 
 port = serial.Serial("COM4",153600)
+#port = serial.Serial("/dev/ttyUSB0",153600)
 
 artNet = Artnet.Artnet("0.0.0.0")
 
