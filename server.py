@@ -1,7 +1,9 @@
 from python_artnet import python_artnet as Artnet
 import serial
+import traceback
+import struct
 
-port = serial.Serial("COM4",115200)
+port = serial.Serial("COM4",153600)
 
 artNet = Artnet.Artnet("0.0.0.0")
 
@@ -15,4 +17,16 @@ while True:
             if artNetPacket.data is not None:
                 dmxPacket = artNetPacket.data
                 sequenceNo = artNetPacket.sequence
-artNet.close()
+                port.write(bytearray([0xAA,0x69]))
+                sum = 0
+                port.write(struct.pack("<512H",*dmxPacket))
+                for i in dmxPacket:
+                #    port.write(bytearray(i))
+                    sum+=i
+                port.write(bytearray([sum&0xFF]))
+    except KeyboardInterrupt:
+        break
+    except :
+        print("Eroor")
+        print(traceback.format_exc())
+        
